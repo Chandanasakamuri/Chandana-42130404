@@ -1,0 +1,175 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class Account {
+    private String accountHolderName;
+    private String accountNumber;
+    private double balance;
+    private ArrayList<String> transactionHistory;
+
+    public Account(String accountHolderName, String accountNumber) {
+        this.accountHolderName = accountHolderName;
+        this.accountNumber = accountNumber;
+        this.balance = 0.0;
+        this.transactionHistory = new ArrayList<>();
+    }
+
+    public String getAccountHolderName() {
+        return accountHolderName;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            transactionHistory.add("Deposited: $" + amount);
+        } else {
+            System.out.println("Invalid deposit amount.");
+        }
+    }
+
+    public void withdraw(double amount) {
+        if (amount <= balance && amount > 0) {
+            balance -= amount;
+            transactionHistory.add("Withdrew: $" + amount);
+        } else {
+            System.out.println("Insufficient balance or invalid amount.");
+        }
+    }
+
+    public void showTransactionHistory() {
+        if (transactionHistory.isEmpty()) {
+            System.out.println("No transactions made yet.");
+        } else {
+            for (String transaction : transactionHistory) {
+                System.out.println(transaction);
+            }
+        }
+    }
+}
+
+class Bank {
+    private ArrayList<Account> accounts;
+
+    public Bank() {
+        accounts = new ArrayList<>();
+    }
+
+    public Account createAccount(String accountHolderName, String accountNumber) {
+        Account account = new Account(accountHolderName, accountNumber);
+        accounts.add(account);
+        System.out.println("Account created successfully.");
+        return account;
+    }
+
+    public Account getAccount(String accountNumber) {
+        for (Account account : accounts) {
+            if (account.getAccountNumber().equals(accountNumber)) {
+                return account;
+            }
+        }
+        return null;
+    }
+}
+
+public class BankingSystem {
+    private static Bank bank = new Bank();
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        while (true) {
+            System.out.println("\nWelcome to the Banking System");
+            System.out.println("1. Create Account");
+            System.out.println("2. Access Account");
+            System.out.println("3. Exit");
+            System.out.print("Please select an option: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    createAccount();
+                    break;
+                case 2:
+                    accessAccount();
+                    break;
+                case 3:
+                    System.out.println("Thank you for using the Banking System. Goodbye!");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid choice, please try again.");
+            }
+        }
+    }
+
+    private static void createAccount() {
+        scanner.nextLine(); // Consume newline left over by nextInt
+        System.out.print("Enter account holder's name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter account number: ");
+        String accountNumber = scanner.nextLine();
+        bank.createAccount(name, accountNumber);
+    }
+
+    private static void accessAccount() {
+        scanner.nextLine(); // Consume newline left over by nextInt
+        System.out.print("Enter your account number: ");
+        String accountNumber = scanner.nextLine();
+        Account account = bank.getAccount(accountNumber);
+
+        if (account != null) {
+            while (true) {
+                System.out.println("\nWelcome, " + account.getAccountHolderName());
+                System.out.println("1. Check Balance");
+                System.out.println("2. Deposit Money");
+                System.out.println("3. Withdraw Money");
+                System.out.println("4. View Transaction History");
+                System.out.println("5. Logout");
+                System.out.print("Please select an option: ");
+                int choice = scanner.nextInt();
+
+                switch (choice) {
+                    case 1:
+                        System.out.println("Current Balance: $" + account.getBalance());
+                        break;
+                    case 2:
+                        depositMoney(account);
+                        break;
+                    case 3:
+                        withdrawMoney(account);
+                        break;
+                    case 4:
+                        account.showTransactionHistory();
+                        break;
+                    case 5:
+                        System.out.println("Logging out...");
+                        return;
+                    default:
+                        System.out.println("Invalid choice, please try again.");
+                }
+            }
+        } else {
+            System.out.println("Account not found.");
+        }
+    }
+
+    private static void depositMoney(Account account) {
+        System.out.print("Enter the amount to deposit: $");
+        double amount = scanner.nextDouble();
+        account.deposit(amount);
+        System.out.println("Deposit successful.");
+    }
+
+    private static void withdrawMoney(Account account) {
+        System.out.print("Enter the amount to withdraw: $");
+        double amount = scanner.nextDouble();
+        account.withdraw(amount);
+    }
+}
