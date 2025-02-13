@@ -1,0 +1,106 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+
+class Student {
+    String name;
+    int age;
+    String id;
+    
+    public Student(String id, String name, int age) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+    }
+    
+    @Override
+    public String toString() {
+        return "ID: " + id + ", Name: " + name + ", Age: " + age;
+    }
+}
+
+public class StudentManagementSystem extends JFrame implements ActionListener {
+    private JTextField idField, nameField, ageField;
+    private DefaultListModel<String> listModel;
+    private JList<String> studentList;
+    private ArrayList<Student> students;
+    
+    public StudentManagementSystem() {
+        setTitle("Student Management System");
+        setSize(400, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+        
+        students = new ArrayList<>();
+        listModel = new DefaultListModel<>();
+        studentList = new JList<>(listModel);
+        
+        add(new JLabel("ID:"));
+        idField = new JTextField(10);
+        add(idField);
+        
+        add(new JLabel("Name:"));
+        nameField = new JTextField(10);
+        add(nameField);
+        
+        add(new JLabel("Age:"));
+        ageField = new JTextField(5);
+        add(ageField);
+        
+        JButton addButton = new JButton("Add");
+        addButton.addActionListener(this);
+        add(addButton);
+        
+        JButton updateButton = new JButton("Update");
+        updateButton.addActionListener(this);
+        add(updateButton);
+        
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.addActionListener(this);
+        add(deleteButton);
+        
+        add(new JScrollPane(studentList));
+        setVisible(true);
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+        String id = idField.getText();
+        String name = nameField.getText();
+        String ageText = ageField.getText();
+        
+        if (id.isEmpty() || name.isEmpty() || ageText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "All fields are required!");
+            return;
+        }
+        
+        try {
+            int age = Integer.parseInt(ageText);
+            if (command.equals("Add")) {
+                Student student = new Student(id, name, age);
+                students.add(student);
+                listModel.addElement(student.toString());
+            } else if (command.equals("Update")) {
+                int index = studentList.getSelectedIndex();
+                if (index != -1) {
+                    students.set(index, new Student(id, name, age));
+                    listModel.set(index, students.get(index).toString());
+                }
+            } else if (command.equals("Delete")) {
+                int index = studentList.getSelectedIndex();
+                if (index != -1) {
+                    students.remove(index);
+                    listModel.remove(index);
+                }
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Age must be a valid number!");
+        }
+    }
+    
+    public static void main(String[] args) {
+        new StudentManagementSystem();
+    }
+}
